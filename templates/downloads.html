@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<table class="table table-striped">
+<thead>
+<tr>
+<th>Descarga</th>
+<th>Mover a películas</th>
+<th>Mover a series</th>
+<th>Mover a música</th>
+</tr>
+</thead>
+{% for download in downloads %}
+<tr>
+<td>{{ download }}</td>
+<td>
+<button type="button" class="btn btn-default btn-lg" onclick="location.href='{{ url_for('classify', name=download, category='peliculas') }}';">
+  <span class="glyphicon glyphicon-film"></span>
+</button>
+</td>
+<td>
+<button type="button" class="btn btn-default btn-lg" onclick="location.href='{{ url_for('classify', name=download, category='series') }}';">
+  <span class="glyphicon glyphicon-calendar"></span>
+</button>
+</td>
+<td>
+<button type="button" class="btn btn-default btn-lg" onclick="location.href='{{ url_for('classify', name=download, category='musica') }}';">
+  <span class="glyphicon glyphicon-music"></span>
+</button>
+</td>
+
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}
