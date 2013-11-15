@@ -66,7 +66,7 @@ def classify(name, category):
 
 @app.route("/run_sentinel")
 def run_sentinel():
-    execfile('/home/pi/raspberrypi/sentinel/scripts/transmission_sentinel.py')
+    execfile('/home/pi/sentinel/scripts/transmission_sentinel.py')
 
     return redirect(url_for('index'))
 
