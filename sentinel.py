@@ -10,6 +10,8 @@ import arrow
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 # app instance
+from tasks import make_celery
+
 app = Flask(__name__)
 
 # configuration
@@ -28,6 +30,12 @@ XBMC_PORT = '8080'
 XBMC_SCAN_METHODS = {'peliculas': 'VideoLibrary.Scan',
                      'series': 'VideoLibrary.Scan',
                      'musica': 'AudioLibrary.Scan'}
+app.config.update(
+    CELERY_BROKER_URL='amqp://guest@localhost:5672//',
+    CELERY_RESULT_BACKEND='amqp://guest@localhost:5672//',
+)
+celery = make_celery(app)
+
 
 # controllers
 @app.route("/")
@@ -63,6 +71,7 @@ def classify(name, category):
         flash(u'"{name}" movido correctamente a "{category}"'.format(name=name, category=category))
 
     return redirect(url_for('downloads'))
+
 
 @app.route("/run_sentinel")
 def run_sentinel():
