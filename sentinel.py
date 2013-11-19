@@ -7,6 +7,7 @@ import os.path
 
 import arrow
 import requests
+import git
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
@@ -20,6 +21,7 @@ DEBUG = True
 SECRET_KEY = 'development key'
 PROPAGATE_EXCEPTIONS = True
 app.config.from_object(__name__)
+PROJECT_ROOT = '/home/pi/sentinel'
 
 STOREX_PATH = '/media/STOREX'
 DOWNLOADS_PATH = '/Descargas'
@@ -66,7 +68,7 @@ def classify(name, category):
                    os.path.normpath(STOREX_PATH+'/'+DESTINATION_CATEGORIES_PATHS[category]+'/'+name))
         # call XBMC to update collection
         xbmc_jsonrpc = 'jsonrpc?request={"jsonrpc": "2.0", "method": "%s"}' % XBMC_SCAN_METHODS[category]
-        requests.get('http://{host}:{port}/{url}'.format(host=XBMC_HOST, port=XBMC_PORT, url=xbmc_port, auth=(XBMC_USER, XBMC_PASSWD))
+        requests.get('http://{host}:{port}/{url}'.format(host=XBMC_HOST, port=XBMC_PORT, url=xbmc_port, auth=(XBMC_USER, XBMC_PASSWD)))
     except OSError as e:
         flash(u'Error mientras se movía "{name}" a "{category}": {error}'.format(name=name, category=category, error=e.strerror))
     else:
@@ -75,10 +77,16 @@ def classify(name, category):
     return redirect(url_for('downloads'))
 
 
-@app.route("/run_sentinel")
+@app.route("/run-sentinel")
 def run_sentinel():
-    execfile('/home/pi/sentinel/scripts/transmission_sentinel.py')
+    execfile('%s/scripts/transmission_sentinel.py' % PROJECT_ROOT)
 
+    return redirect(url_for('index'))
+
+@app.route("/git-hook")
+def git_hook():
+    g = git.cmd.Git(PROJECT_ROOT)                 
+    g.pull()
     return redirect(url_for('index'))
 
 if __name__ == "__main__":
