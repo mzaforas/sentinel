@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 # all the imports
-from httplib import HTTPConnection
-
 import sys
 import os
 import os.path
+
 import arrow
+import requests
+
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 # app instance
@@ -27,14 +28,17 @@ DESTINATION_CATEGORIES_PATHS = {'peliculas': 'Peliculas',
                                 'musica': 'Musica'}
 XBMC_HOST = '192.168.1.10'
 XBMC_PORT = '8080'
+XBMC_USER = 'xbmc'
+XBMC_PASSWD = 'xbmc'
 XBMC_SCAN_METHODS = {'peliculas': 'VideoLibrary.Scan',
                      'series': 'VideoLibrary.Scan',
                      'musica': 'AudioLibrary.Scan'}
-app.config.update(
-    CELERY_BROKER_URL='amqp://guest@localhost:5672//',
-    CELERY_RESULT_BACKEND='amqp://guest@localhost:5672//',
-)
-celery = make_celery(app)
+
+# app.config.update(
+#     CELERY_BROKER_URL='amqp://guest@localhost:5672//',
+#     CELERY_RESULT_BACKEND='amqp://guest@localhost:5672//',
+# )
+# celery = make_celery(app)
 
 
 # controllers
@@ -61,10 +65,8 @@ def classify(name, category):
         os.renames(os.path.normpath(STOREX_PATH+'/'+DOWNLOADS_PATH+'/'+name),
                    os.path.normpath(STOREX_PATH+'/'+DESTINATION_CATEGORIES_PATHS[category]+'/'+name))
         # call XBMC to update collection
-        #xbmc_jsonrpc = 'jsonrpc?request={"jsonrpc": "2.0", "method": "{method}"}'.format(method=XBMC_SCAN_METHODS[category])
-        #conn = HTTPConnection(host=XBMC_HOST, port=XBMC_PORT)
-        #conn.request(method='GET', url=xbmc_jsonrpc)
-        # working here
+        xbmc_jsonrpc = 'jsonrpc?request={"jsonrpc": "2.0", "method": "%s"}' % XBMC_SCAN_METHODS[category]
+        requests.get('http://{host}:{port}/{url}'.format(host=XBMC_HOST, port=XBMC_PORT, url=xbmc_port, auth=(XBMC_USER, XBMC_PASSWD))
     except OSError as e:
         flash(u'Error mientras se movía "{name}" a "{category}": {error}'.format(name=name, category=category, error=e.strerror))
     else:
