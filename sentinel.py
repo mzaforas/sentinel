@@ -86,7 +86,8 @@ def run_sentinel():
 @app.route("/git-hook")
 def git_hook():
     g = git.cmd.Git(PROJECT_ROOT)                 
-    g.pull()
+    pull_response = g.pull()
+    flash(pull_response)
     return redirect(url_for('index'))
 
 if __name__ == "__main__":
