@@ -1,7 +1,0 @@
-fromaddr = 'zaforasperez@gmail.com'  
-toaddrs  = 'zaforasperez@gmail.com'  
-mail_username = 'zaforasperez'  
-mail_password = 'valdebebas'  
-transmission_username = 'transmission'  
-transmission_password = 'transmission'
-transmission_host = '192.168.1.10'
