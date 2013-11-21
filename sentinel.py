@@ -54,7 +54,12 @@ def downloads():
     """
     Download list for classify
     """
-    downloads_list = os.listdir(STOREX_PATH+'/'+DOWNLOADS_PATH)
+    try:
+        downloads_list = os.listdir(STOREX_PATH+'/'+DOWNLOADS_PATH)
+    except OSError:
+        flash(u'No es posible acceder al directorio de descargas. ¿está STOREX montado?')
+        downloads_list = []
+
     return render_template('downloads.html', downloads=downloads_list)
 
 
@@ -68,7 +73,7 @@ def classify(name, category):
                    os.path.normpath(STOREX_PATH+'/'+DESTINATION_CATEGORIES_PATHS[category]+'/'+name))
         # call XBMC to update collection
         xbmc_jsonrpc = 'jsonrpc?request={"jsonrpc": "2.0", "method": "%s"}' % XBMC_SCAN_METHODS[category]
-        requests.get('http://{host}:{port}/{url}'.format(host=XBMC_HOST, port=XBMC_PORT, url=xbmc_port, auth=(XBMC_USER, XBMC_PASSWD)))
+        requests.get('http://{host}:{port}/{url}'.format(host=XBMC_HOST, port=XBMC_PORT, url=xbmc_jsonrpc), auth=(XBMC_USER, XBMC_PASSWD))
     except OSError as e:
         flash(u'Error mientras se movía "{name}" a "{category}": {error}'.format(name=name, category=category, error=e.strerror))
     else:
