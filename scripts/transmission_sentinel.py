@@ -26,7 +26,7 @@ for torrent in client.get_torrents():
                 shutil.copytree(src_path, dst_path)
             else:
                 shutil.copy(src_path, dst_path)
-        except IOError as e:
+        except (IOError, OSError) as e:
             msg = 'Subject: Transmission sentinel error\n\nError when trying move torrent finished: {name}'.format(name=torrent.name)
             server.sendmail(fromaddr, toaddrs, msg)
             continue
