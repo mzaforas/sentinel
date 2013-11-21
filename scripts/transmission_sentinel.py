@@ -14,7 +14,7 @@ server.login(mail_username, mail_password)
 client = transmissionrpc.Client(address=transmission_host, user=transmission_username, password=transmission_password)
 
 for torrent in client.get_torrents():
-    if torrent.progress== 100.0:
+    if torrent.progress == 100.0:
         msg = u'Subject: Transmission sentinel notification\n\nTorrent finished: %s' % torrent.name
         torrent.stop()
 
