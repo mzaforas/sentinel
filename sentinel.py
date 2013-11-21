@@ -55,7 +55,7 @@ def downloads():
     Download list for classify
     """
     try:
-        downloads_list = os.listdir(STOREX_PATH+'/'+DOWNLOADS_PATH)
+        downloads_list = os.listdir(STOREX_PATH + '/' + DOWNLOADS_PATH)
     except OSError:
         flash(u'No es posible acceder al directorio de descargas. ¿está STOREX montado?')
         downloads_list = []
@@ -68,15 +68,28 @@ def classify(name, category):
     """
     Classify downloaded element
     """
+    if category == 'series':
+        # si se detecta el patron de una serie en el nombre se modifica el directorio destino
+        destination_serie = ''
+        series_names = os.listdir(STOREX_PATH + '/' + DOWNLOADS_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category])
+        for serie_name in series_names:
+            if serie_name.lower() in name.lower().replace(' ', ''):
+                destination_serie = '/' + serie_name
+        destination_path = DESTINATION_CATEGORIES_PATHS[category] + destination_serie
+    else:
+        destination_path = DESTINATION_CATEGORIES_PATHS[category]
+
     try:
-        os.renames(os.path.normpath(STOREX_PATH+'/'+DOWNLOADS_PATH+'/'+name),
-                   os.path.normpath(STOREX_PATH+'/'+DESTINATION_CATEGORIES_PATHS[category]+'/'+name))
-        # call XBMC to update collection
-        xbmc_jsonrpc = 'jsonrpc?request={"jsonrpc": "2.0", "method": "%s"}' % XBMC_SCAN_METHODS[category]
-        requests.get('http://{host}:{port}/{url}'.format(host=XBMC_HOST, port=XBMC_PORT, url=xbmc_jsonrpc), auth=(XBMC_USER, XBMC_PASSWD))
+        # mover a directorio destino
+        os.renames(os.path.normpath(STOREX_PATH + '/' + DOWNLOADS_PATH + '/' + name),
+                   os.path.normpath(STOREX_PATH + '/' + destination_path + '/' + name))
     except OSError as e:
         flash(u'Error mientras se movía "{name}" a "{category}": {error}'.format(name=name, category=category, error=e.strerror))
     else:
+        # call XBMC to update collection
+        xbmc_jsonrpc = 'jsonrpc?request={"jsonrpc": "2.0", "method": "%s"}' % XBMC_SCAN_METHODS[category]
+        requests.get('http://{host}:{port}/{url}'.format(host=XBMC_HOST, port=XBMC_PORT, url=xbmc_jsonrpc), auth=(XBMC_USER, XBMC_PASSWD))
+
         flash(u'"{name}" movido correctamente a "{category}"'.format(name=name, category=category))
 
     return redirect(url_for('downloads'))
@@ -88,10 +101,11 @@ def run_sentinel():
 
     return redirect(url_for('index'))
 
+
 @app.route("/git-hook")
 def git_hook():
-    g = git.cmd.Git(PROJECT_ROOT)                 
-    pull_response = g.pull()
+    repository = git.cmd.Git(PROJECT_ROOT)
+    pull_response = repository.pull()
     flash(pull_response)
     return redirect(url_for('index'))
 
