@@ -8,8 +8,12 @@ import os.path
 import arrow
 import requests
 import git
+import logging
+from logging.handlers import SMTPHandler
+
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from credentials import *
 
 # app instance
 from tasks import make_celery
@@ -22,6 +26,13 @@ SECRET_KEY = 'development key'
 PROPAGATE_EXCEPTIONS = True
 app.config.from_object(__name__)
 PROJECT_ROOT = '/home/pi/sentinel'
+
+ADMINS = ['mzaforas@gmail.com']
+mail_handler = SMTPHandler('smtp.gmail.com', fromaddr,
+                           ADMINS, 'Sentinel Error',
+                           credentials=(mail_username, mail_password))
+mail_handler.setLevel(logging.ERROR)
+app.logger.addHandler(mail_handler)
 
 STOREX_PATH = '/media/STOREX'
 DOWNLOADS_PATH = '/Descargas'
@@ -71,7 +82,7 @@ def classify(name, category):
     if category == 'series':
         # si se detecta el patron de una serie en el nombre se modifica el directorio destino
         destination_serie = ''
-        series_names = os.listdir(STOREX_PATH + '/' + DOWNLOADS_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category])
+        series_names = os.listdir(STOREX_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category])
         for serie_name in series_names:
             if serie_name.lower() in name.lower().replace(' ', ''):
                 destination_serie = '/' + serie_name
