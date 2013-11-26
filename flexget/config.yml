@@ -1,0 +1,24 @@
+tasks:
+  # Task: get series torrents
+  get_series:
+    rss: http://rss.thepiratebay.sx/208
+    series:
+      - Homeland:
+          quality: hdtv
+    transmission:
+      host: localhost
+      port: 9091
+      username: transmission
+      password: transmission
+      removewhendone: no
+  
+  # Task: init flexget DB with series in STOREX (only run first time)
+  seed_series_db:
+    # The find plugin will find all of your existing episodes
+    find:
+      regexp: .*(avi|mkv|mp4)$
+      path: /media/STOREX/Series
+      recursive: yes
+    # We use the manual plugin so that this task only runs when explicitly called
+    manual: yes
+
