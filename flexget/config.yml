@@ -5,6 +5,10 @@ tasks:
     series:
       - Homeland:
           quality: hdtv
+      - Castle:
+          quality: hdtv
+          name_regexp:
+            - ^Castle.*\[Cas\]$
     transmission:
       host: localhost
       port: 9091
