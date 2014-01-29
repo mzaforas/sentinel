@@ -39,10 +39,10 @@ DOWNLOADS_PATH = '/Descargas'
 DESTINATION_CATEGORIES_PATHS = {'peliculas': 'Peliculas',
                                 'series': 'Series',
                                 'musica': 'Musica'}
-XBMC_HOST = '192.168.1.10'
+XBMC_HOST = 'xbmc'
 XBMC_PORT = '8080'
 XBMC_USER = 'xbmc'
-XBMC_PASSWD = 'xbmc'
+XBMC_PASSWD = ''
 XBMC_SCAN_METHODS = {'peliculas': 'VideoLibrary.Scan',
                      'series': 'VideoLibrary.Scan',
                      'musica': 'AudioLibrary.Scan'}
