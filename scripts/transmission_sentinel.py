@@ -15,8 +15,6 @@ server.login(mail_username, mail_password)
 client = transmissionrpc.Client(address=transmission_host, user=transmission_username, password=transmission_password)
 
 def scp_torrent(torrent):
-    msg = u'Subject: Transmission sentinel notification\n\nTorrent finished: %s' % torrent.name
-    
     src_path = os.path.normpath(unicode(torrent.downloadDir) + u'/' + unicode(torrent.name))
     dst_path = os.path.normpath(u"/media/STOREX/Descargas/" + unicode(torrent.name))
 
@@ -43,6 +41,8 @@ for torrent in client.get_torrents():
         scp_torrent(torrent)
 
         client.remove_torrent(torrent.id, delete_data=True)
+
+        msg = u'Subject: Transmission sentinel notification\n\nTorrent finished: %s' % torrent.name
         server.sendmail(fromaddr, toaddrs, msg)
             
 
