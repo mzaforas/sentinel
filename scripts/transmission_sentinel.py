@@ -5,6 +5,7 @@ import shutil
 import smtplib  
 import os.path
 import paramiko
+import sys
 
 from credentials import *
 
@@ -27,7 +28,7 @@ def scp_torrent(torrent):
 
         sftp.put(src_path, dst_path)
     except:
-        msg = 'Subject: Transmission sentinel error\n\nError when trying move torrent finished: {name}'.format(name=torrent.name)
+        msg = 'Subject: Transmission sentinel error\n\nError when trying move torrent finished: {name}\n\n{exception}'.format(name=torrent.name, exception=sys.exc_info()[0])
         server.sendmail(fromaddr, toaddrs, msg)
 
     sftp.close()
