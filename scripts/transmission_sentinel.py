@@ -30,21 +30,24 @@ def scp_torrent(torrent):
     except:
         msg = 'Subject: Transmission sentinel error\n\nError when trying move torrent finished: {name}\n\n{exception}'.format(name=torrent.name, exception=sys.exc_info()[0])
         server.sendmail(fromaddr, toaddrs, msg)
-
-    sftp.close()
-    transport.close()
+        return False
+    else:
+        sftp.close()
+        transport.close()
+        return True
 
 for torrent in client.get_torrents():
     if torrent.progress == 100.0:
 
         torrent.stop()
 
-        scp_torrent(torrent)
+        copied = scp_torrent(torrent)
 
-        client.remove_torrent(torrent.id, delete_data=True)
+        if copied:
+            client.remove_torrent(torrent.id, delete_data=True)
 
-        msg = u'Subject: Transmission sentinel notification\n\nTorrent finished: %s' % torrent.name
-        server.sendmail(fromaddr, toaddrs, msg)
+            msg = u'Subject: Transmission sentinel notification\n\nTorrent finished: %s' % torrent.name
+            server.sendmail(fromaddr, toaddrs, msg)
             
 
 server.quit()  
