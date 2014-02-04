@@ -4,8 +4,9 @@ import transmissionrpc
 import shutil
 import smtplib  
 import os.path
-import paramiko
 import sys
+from fabric.api import env
+from fabric.operations import run, put
 
 from credentials import *
 
@@ -17,24 +18,19 @@ client = transmissionrpc.Client(address=transmission_host, user=transmission_use
 
 def scp_torrent(torrent):
     src_path = os.path.normpath(unicode(torrent.downloadDir) + u'/' + unicode(torrent.name))
-    dst_path = os.path.normpath(u"/media/STOREX/Descargas/" + unicode(torrent.name))
+    dst_path = os.path.normpath(u"/media/STOREX/Descargas/")
 
+    env.host_string = 'xbmc'
     try:
-        transport = paramiko.Transport(('xbmc', 22))
-        rsa_key = paramiko.RSAKey.from_private_key_file('/home/pi/.ssh/id_rsa')
-        transport.connect(username='pi', pkey=rsa_key)
-
-        sftp = paramiko.SFTPClient.from_transport(transport)
-
-        sftp.put(src_path, dst_path)
+        res = put(src_path, dst_path)
+        if res.failed:
+            raise Exception
     except:
         msg = 'Subject: Transmission sentinel error\n\nError when trying move torrent finished: {name}\n\n{exception}'.format(name=torrent.name, exception=sys.exc_info()[0])
         server.sendmail(fromaddr, toaddrs, msg)
         return False
-    else:
-        sftp.close()
-        transport.close()
-        return True
+
+    return True
 
 for torrent in client.get_torrents():
     if torrent.progress == 100.0:
