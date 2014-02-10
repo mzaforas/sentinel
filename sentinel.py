@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# all the imports
 import sys
 import os
 import os.path
@@ -11,11 +10,12 @@ import git
 import logging
 from logging.handlers import SMTPHandler
 
+from fabric.operations import run
+from fabric.api import env
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from credentials import *
 
-# app instance
 from tasks import make_celery
 
 app = Flask(__name__)
@@ -47,6 +47,9 @@ XBMC_SCAN_METHODS = {'peliculas': 'VideoLibrary.Scan',
                      'series': 'VideoLibrary.Scan',
                      'musica': 'AudioLibrary.Scan'}
 
+env.host_string = XBMC_HOST
+env.user = "pi"
+
 # app.config.update(
 #     CELERY_BROKER_URL='amqp://guest@localhost:5672//',
 #     CELERY_RESULT_BACKEND='amqp://guest@localhost:5672//',
@@ -66,7 +69,7 @@ def downloads():
     Download list for classify
     """
     try:
-        downloads_list = os.listdir(STOREX_PATH + '/' + DOWNLOADS_PATH)
+        downloads_list = run("ls -1 %s" % STOREX_PATH + '/' + DOWNLOADS_PATH).split('\r\n')
     except OSError:
         flash(u'No es posible acceder al directorio de descargas. ¿está STOREX montado?')
         downloads_list = []
@@ -82,9 +85,9 @@ def classify(name, category):
     if category == 'series':
         # si se detecta el patron de una serie en el nombre se modifica el directorio destino
         destination_serie = ''
-        series_names = os.listdir(STOREX_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category])
+        series_names = run("ls -1 %s" % STOREX_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category]).split('\r\n')
         for serie_name in series_names:
-            if serie_name.lower() in name.lower().replace(' ', ''):
+            if serie_name.lower().replace(' ', '') in name.lower().replace(' ', '').replace('-', '').replace('_', ''):
                 destination_serie = '/' + serie_name
         destination_path = DESTINATION_CATEGORIES_PATHS[category] + destination_serie
     else:
@@ -92,9 +95,10 @@ def classify(name, category):
 
     try:
         # mover a directorio destino
-        os.renames(os.path.normpath(STOREX_PATH + '/' + DOWNLOADS_PATH + '/' + name),
-                   os.path.normpath(STOREX_PATH + '/' + destination_path + '/' + name))
-    except OSError as e:
+        origin = os.path.normpath(STOREX_PATH + '/' + DOWNLOADS_PATH + '/' + name)
+        destination = os.path.normpath(STOREX_PATH + '/' + destination_path + '/' + name)
+        run('mv "%s" "%s"' % (origin, destination))
+    except Exception as e:
         flash(u'Error mientras se movía "{name}" a "{category}": {error}'.format(name=name, category=category, error=e.strerror))
     else:
         # call XBMC to update collection
