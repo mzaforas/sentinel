@@ -73,6 +73,9 @@ def downloads():
     except OSError:
         flash(u'No es posible acceder al directorio de descargas. ¿está STOREX montado?')
         downloads_list = []
+    except Exception as e:
+        flash(u'Error desconocido: %s' % e.message)
+        downloads_list = []
 
     return render_template('downloads.html', downloads=downloads_list)
 
