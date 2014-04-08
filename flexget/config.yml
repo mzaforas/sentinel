@@ -9,6 +9,8 @@ tasks:
           quality: hdtv
           name_regexp:
             - ^Castle.*\[Cas\]$
+      - Game of thrones:
+          quality: hdtv
     transmission:
       host: localhost
       port: 9091
