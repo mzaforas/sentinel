@@ -1,7 +1,7 @@
 tasks:
   # Task: get series torrents
   get_series:
-    rss: http://rss.thepiratebay.sx/208
+    rss: http://rss.thepiratebay.se/208
     series:
       - Homeland:
           quality: hdtv
