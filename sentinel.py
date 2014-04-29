@@ -3,6 +3,7 @@
 import sys
 import os
 import os.path
+import re
 
 import arrow
 import requests
@@ -90,7 +91,7 @@ def classify(name, category):
         destination_serie = ''
         series_names = run("ls -1 %s" % STOREX_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category]).split('\r\n')
         for serie_name in series_names:
-            if serie_name.lower().replace(' ', '') in name.lower().replace(' ', '').replace('-', '').replace('_', ''):
+            if serie_name.lower().replace(' ', '') in re.sub('[._\- ]', '', name.lower()):
                 destination_serie = '/' + serie_name
         destination_path = DESTINATION_CATEGORIES_PATHS[category] + destination_serie
     else:
@@ -108,7 +109,7 @@ def classify(name, category):
         xbmc_jsonrpc = 'jsonrpc?request={"jsonrpc": "2.0", "method": "%s"}' % XBMC_SCAN_METHODS[category]
         requests.get('http://{host}:{port}/{url}'.format(host=XBMC_HOST, port=XBMC_PORT, url=xbmc_jsonrpc), auth=(XBMC_USER, XBMC_PASSWD))
 
-        flash(u'"{name}" movido correctamente a "{category}"'.format(name=name, category=category))
+        flash(u'"{name}" movido correctamente a "{category} ({destination})"'.format(name=name, category=category, destination=destination_path))
 
     return redirect(url_for('downloads'))
 
