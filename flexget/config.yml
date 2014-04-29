@@ -11,11 +11,13 @@ tasks:
             - ^Castle.*\[Cas\]$
       - Game of thrones:
           quality: hdtv
+      - Cosmos:
+          quality: hdtv
     transmission:
       host: localhost
       port: 9091
-      username: transmission
-      password: transmission
+      username: pi
+      password: pi
       removewhendone: no
   
   # Task: init flexget DB with series in STOREX (only run first time)
