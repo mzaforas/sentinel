@@ -71,6 +71,8 @@ def downloads():
     """
     try:
         downloads_list = run("ls -1 %s" % STOREX_PATH + '/' + DOWNLOADS_PATH).split('\r\n')
+        if '' in downloads_list:
+            downloads_list.remove('')
     except OSError:
         flash(u'No es posible acceder al directorio de descargas. ¿está STOREX montado?')
         downloads_list = []
@@ -86,17 +88,40 @@ def classify(name, category):
     """
     Classify downloaded element
     """
-    if category == 'series':
-        # si se detecta el patron de una serie en el nombre se modifica el directorio destino
-        destination_serie = ''
-        series_names = run("ls -1 %s" % STOREX_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category]).split('\r\n')
-        for serie_name in series_names:
-            if serie_name.lower().replace(' ', '') in re.sub('[._\- ]', '', name.lower()):
-                destination_serie = '/' + serie_name
-        destination_path = DESTINATION_CATEGORIES_PATHS[category] + destination_serie
+    if category == 'eliminar':
+        _remove(name)
+    elif category == 'series':
+        destination_path = _get_serie_destination_path(name, category)
+        _move_to_destination(name, category, destination_path)
     else:
         destination_path = DESTINATION_CATEGORIES_PATHS[category]
+        _move_to_destination(name, category, destination_path)
 
+    return redirect(url_for('downloads'))
+
+
+def _remove(name):
+    try:
+        origin = os.path.normpath(STOREX_PATH + '/' + DOWNLOADS_PATH + '/' + name)
+        run('rm -r "%s"' % origin)
+    except Exception as e:
+        flash(u'Error mientras se eliminaba "{name}": {error}'.format(name=name, error=e.strerror))
+    else:
+        flash(u'"{name}" eliminado correctamente'.format(name=name))
+
+
+def _get_serie_destination_path(name, category):
+    # si se detecta el patron de una serie en el nombre se modifica el directorio destino
+    destination_serie = ''
+    series_names = run("ls -1 %s" % STOREX_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category]).split('\r\n')
+    for serie_name in series_names:
+        if serie_name.lower().replace(' ', '') in re.sub('[._\- ]', '', name.lower()):
+            destination_serie = '/' + serie_name
+    destination_path = DESTINATION_CATEGORIES_PATHS[category] + destination_serie
+    return destination_path
+
+
+def _move_to_destination(name, category, destination_path):
     try:
         # mover a directorio destino
         origin = os.path.normpath(STOREX_PATH + '/' + DOWNLOADS_PATH + '/' + name)
@@ -110,8 +135,6 @@ def classify(name, category):
         requests.get('http://{host}:{port}/{url}'.format(host=XBMC_HOST, port=XBMC_PORT, url=xbmc_jsonrpc), auth=(XBMC_USER, XBMC_PASSWD))
 
         flash(u'"{name}" movido correctamente a "{category} ({destination})"'.format(name=name, category=category, destination=destination_path))
-
-    return redirect(url_for('downloads'))
 
 
 @app.route("/run-sentinel")
