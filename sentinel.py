@@ -70,7 +70,7 @@ def downloads():
     Download list for classify
     """
     try:
-        downloads_list = run("ls -1 %s" % STOREX_PATH + '/' + DOWNLOADS_PATH).split('\r\n')
+        downloads_list = run("ls -1 %s" % STOREX_PATH + DOWNLOADS_PATH).split('\r\n')
         if '' in downloads_list:
             downloads_list.remove('')
     except OSError:
