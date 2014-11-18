@@ -13,6 +13,8 @@ tasks:
           quality: hdtv
       - Cosmos:
           quality: hdtv
+      - Outlander:
+          quality: hdtv
     transmission:
       host: localhost
       port: 9091
