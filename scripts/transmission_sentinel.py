@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import transmissionrpc
-import shutil
-import smtplib  
+import smtplib
 import os.path
 import sys
 from fabric.api import env
@@ -28,7 +27,7 @@ def scp_torrent(torrent):
     try:
         res = put(src_path, dst_path, use_glob=False)
         if res.failed:
-            raise Exception
+            raise ValueError(res.failed)
     except:
         msg = 'Subject: Transmission sentinel error\n\nError when trying move torrent finished: {name}\n\n{exception}\n\n{traceback}'.format(name=torrent.name, exception=sys.exc_info(), traceback=traceback.format_exc())
         notify(msg)
