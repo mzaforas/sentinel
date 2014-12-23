@@ -2,9 +2,10 @@ tasks:
   # Task: get series torrents
   get_series:
     rss: http://showrss.info/feeds/all.rss
+    #rss: http://kickass.so/tv/?rss=1
     series:
       - Homeland:
-          quality: hdtv
+          quality: 720p+
       - Castle:
           quality: hdtv
           name_regexp:
