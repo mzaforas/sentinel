@@ -4,6 +4,8 @@ tasks:
     rss: http://showrss.info/feeds/all.rss
     #rss: http://kickass.so/tv/?rss=1
     series:
+      - Sherlock:
+          quality: 720p+
       - Homeland:
           quality: 720p+
       - Castle:
