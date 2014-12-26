@@ -77,7 +77,7 @@ def downloads():
         flash(u'No es posible acceder al directorio de descargas. ¿está STOREX montado?')
         downloads_list = []
     except Exception as e:
-        flash(u'Error desconocido: %s' % e.message)
+        flash(u'Error desconocido: {} {}'.format(type(e), e.message))
         downloads_list = []
 
     return render_template('downloads.html', downloads=downloads_list)
