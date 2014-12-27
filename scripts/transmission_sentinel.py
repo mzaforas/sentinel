@@ -44,7 +44,7 @@ for torrent in client.get_torrents():
 
         if copied:
             client.remove_torrent(torrent.id, delete_data=True)
-            notify(u'Subject: Transmission sentinel notification\n\nTorrent finished: %s' % torrent.name)
+            notify(u'Subject: Transmission sentinel notification\n\nTorrent finished: %s\n<a href="http://mzaforas.redirectme.net/sentinel/downloads">Classify it!</a>' % torrent.name)
             
 
 
