@@ -8,10 +8,6 @@ tasks:
           quality: 720p+
       - Homeland:
           quality: 720p+
-      - Castle:
-          quality: hdtv
-          name_regexp:
-            - ^Castle.*\[Cas\]$
       - Game of thrones:
           quality: hdtv
       - Cosmos:
@@ -25,12 +21,12 @@ tasks:
       password: pi
       removewhendone: no
   
-  # Task: init flexget DB with series in STOREX (only run first time)
+  # Task: init flexget DB with series in HDD (only run first time)
   seed_series_db:
     # The find plugin will find all of your existing episodes
     find:
       regexp: .*(avi|mkv|mp4)$
-      path: /media/STOREX/Series
+      path: /media/passport/Series
       recursive: yes
     # We use the manual plugin so that this task only runs when explicitly called
     manual: yes

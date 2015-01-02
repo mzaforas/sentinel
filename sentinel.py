@@ -35,7 +35,7 @@ mail_handler = SMTPHandler('smtp.gmail.com', fromaddr,
 mail_handler.setLevel(logging.ERROR)
 app.logger.addHandler(mail_handler)
 
-STOREX_PATH = '/media/STOREX'
+HDD_PATH = '/media/passport'
 DOWNLOADS_PATH = '/Descargas'
 DESTINATION_CATEGORIES_PATHS = {'peliculas': 'Peliculas',
                                 'series': 'Series',
@@ -70,11 +70,11 @@ def downloads():
     Download list for classify
     """
     try:
-        downloads_list = run("ls -1 %s" % STOREX_PATH + DOWNLOADS_PATH).split('\r\n')
+        downloads_list = run("ls -1 %s" % HDD_PATH + DOWNLOADS_PATH).split('\r\n')
         if '' in downloads_list:
             downloads_list.remove('')
     except OSError:
-        flash(u'No es posible acceder al directorio de descargas. ¿está STOREX montado?')
+        flash(u'No es posible acceder al directorio de descargas. ¿está HDD montado?')
         downloads_list = []
     except Exception as e:
         flash(u'Error desconocido: {} {}'.format(type(e), e.message))
@@ -102,7 +102,7 @@ def classify(name, category):
 
 def _remove(name):
     try:
-        origin = os.path.normpath(STOREX_PATH + '/' + DOWNLOADS_PATH + '/' + name)
+        origin = os.path.normpath(HDD_PATH + '/' + DOWNLOADS_PATH + '/' + name)
         run('rm -r "%s"' % origin)
     except Exception as e:
         flash(u'Error mientras se eliminaba "{name}": {error}'.format(name=name, error=e.strerror))
@@ -113,7 +113,7 @@ def _remove(name):
 def _get_serie_destination_path(name, category):
     # si se detecta el patron de una serie en el nombre se modifica el directorio destino
     destination_serie = ''
-    series_names = run("ls -1 %s" % STOREX_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category]).split('\r\n')
+    series_names = run("ls -1 %s" % HDD_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category]).split('\r\n')
     for serie_name in series_names:
         if serie_name.lower().replace(' ', '') in re.sub('[._\- ]', '', name.lower()):
             destination_serie = '/' + serie_name
@@ -124,8 +124,8 @@ def _get_serie_destination_path(name, category):
 def _move_to_destination(name, category, destination_path):
     try:
         # mover a directorio destino
-        origin = os.path.normpath(STOREX_PATH + '/' + DOWNLOADS_PATH + '/' + name)
-        destination = os.path.normpath(STOREX_PATH + '/' + destination_path + '/' + name)
+        origin = os.path.normpath(HDD_PATH + '/' + DOWNLOADS_PATH + '/' + name)
+        destination = os.path.normpath(HDD_PATH + '/' + destination_path + '/' + name)
         run('mv "%s" "%s"' % (origin, destination))
     except Exception as e:
         flash(u'Error mientras se movía "{name}" a "{category}": {error}'.format(name=name, category=category, error=e.strerror))
