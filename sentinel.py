@@ -35,7 +35,7 @@ mail_handler = SMTPHandler('smtp.gmail.com', fromaddr,
 mail_handler.setLevel(logging.ERROR)
 app.logger.addHandler(mail_handler)
 
-HDD_PATH = '/media/passport'
+HDD_PATH = '/media/elements'
 DOWNLOADS_PATH = '/Descargas'
 DESTINATION_CATEGORIES_PATHS = {'peliculas': 'Peliculas',
                                 'series': 'Series',

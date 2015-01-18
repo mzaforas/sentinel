@@ -21,7 +21,7 @@ def notify(msg):
 
 def scp_torrent(torrent):
     src_path = os.path.normpath(torrent.downloadDir + '/' + torrent.name)
-    dst_path = os.path.normpath(u"/media/passport/Descargas/")
+    dst_path = os.path.normpath(u"/media/elements/Descargas/")
 
     env.host_string = 'xbmc'
     try:
