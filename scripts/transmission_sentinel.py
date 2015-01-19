@@ -15,7 +15,16 @@ def notify(msg):
     server = smtplib.SMTP('smtp.gmail.com:587')  
     server.starttls()  
     server.login(mail_username, mail_password)  
-    server.sendmail(fromaddr, toaddrs, msg)
+
+    email = MIMEMultipart('alternative')
+    email['Subject'] = "Sentinel"
+    email['From'] = fromaddr
+    email['To'] = toaddrs
+    text = MIMEText(msg, 'plain')
+    html = MIMEText('<html><body>{}</body></html>'.format(msg), 'html')
+    email.attach(text)
+    email.attach(html)
+    server.sendmail(fromaddr, toaddrs, email.as_string())
     server.quit()
 
 
