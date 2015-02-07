@@ -5,29 +5,30 @@ tasks:
     #rss: http://kickass.so/tv/?rss=1
     series:
       - Sherlock:
-          quality: 720p+
+          quality: hdtv
       - Homeland:
-          quality: 720p+
+          quality: hdtv
       - Game of thrones:
           quality: hdtv
       - Cosmos:
           quality: hdtv
       - Outlander:
           quality: hdtv
+      - Agent carter:
+          quality: hdtv
     transmission:
       host: localhost
       port: 9091
       username: pi
       password: pi
-      removewhendone: no
   
   # Task: init flexget DB with series in HDD (only run first time)
-  seed_series_db:
-    # The find plugin will find all of your existing episodes
-    find:
-      regexp: .*(avi|mkv|mp4)$
-      path: /media/passport/Series
-      recursive: yes
-    # We use the manual plugin so that this task only runs when explicitly called
-    manual: yes
+  # seed_series_db:
+  #   # The find plugin will find all of your existing episodes
+  #   find:
+  #     regexp: .*(avi|mkv|mp4)$
+  #     path: /media/elements/Series
+  #     recursive: yes
+  #   # We use the manual plugin so that this task only runs when explicitly called
+  #   manual: yes
 

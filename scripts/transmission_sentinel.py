@@ -7,6 +7,8 @@ import sys
 from fabric.api import env
 from fabric.operations import run, put
 import traceback
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from credentials import *
 
