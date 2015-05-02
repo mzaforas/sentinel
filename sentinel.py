@@ -70,13 +70,14 @@ def downloads():
     Download list for classify
     """
     try:
-        downloads_list = run("ls -1 %s" % HDD_PATH + DOWNLOADS_PATH).split('\r\n')
+        downloads_list = [file.encode('ascii', 'ignore') for file in run("ls -1 %s" % HDD_PATH + DOWNLOADS_PATH).split('\r\n')]
+        #downloads_list = [elem.encode('ascii', 'ignore') for elem in os.listdir('/media/elements/Descargas/')]
         if '' in downloads_list:
             downloads_list.remove('')
-    except OSError:
-        flash(u'No es posible acceder al directorio de descargas. ¿está HDD montado?')
+    except OSError as e:
+        flash(u'No es posible acceder al directorio de descargas. ¿está HDD montado? {}'.format(e))
         downloads_list = []
-    except Exception as e:
+    except BaseException as e:
         flash(u'Error desconocido: {} {}'.format(type(e), e.message))
         downloads_list = []
 
@@ -88,14 +89,17 @@ def classify(name, category):
     """
     Classify downloaded element
     """
-    if category == 'eliminar':
-        _remove(name)
-    elif category == 'series':
-        destination_path = _get_serie_destination_path(name, category)
-        _move_to_destination(name, category, destination_path)
-    else:
-        destination_path = DESTINATION_CATEGORIES_PATHS[category]
-        _move_to_destination(name, category, destination_path)
+    try:
+        if category == 'eliminar':
+            _remove(name)
+        elif category == 'series':
+            destination_path = _get_serie_destination_path(name, category)
+            _move_to_destination(name, category, destination_path)
+        else:
+            destination_path = DESTINATION_CATEGORIES_PATHS[category]
+            _move_to_destination(name, category, destination_path)
+    except BaseException as e:
+        flash(u'Error desconocido: {} {}'.format(type(e), e.message))
 
     return redirect(url_for('downloads'))
 
@@ -104,7 +108,7 @@ def _remove(name):
     try:
         origin = os.path.normpath(HDD_PATH + '/' + DOWNLOADS_PATH + '/' + name)
         run('rm -r "%s"' % origin)
-    except Exception as e:
+    except BaseException as e:
         flash(u'Error mientras se eliminaba "{name}": {error}'.format(name=name, error=e.strerror))
     else:
         flash(u'"{name}" eliminado correctamente'.format(name=name))
@@ -127,7 +131,7 @@ def _move_to_destination(name, category, destination_path):
         origin = os.path.normpath(HDD_PATH + '/' + DOWNLOADS_PATH + '/' + name)
         destination = os.path.normpath(HDD_PATH + '/' + destination_path + '/' + name)
         run('mv "%s" "%s"' % (origin, destination))
-    except Exception as e:
+    except BaseException as e:
         flash(u'Error mientras se movía "{name}" a "{category}": {error}'.format(name=name, category=category, error=e.strerror))
     else:
         # call XBMC to update collection
