@@ -8,32 +8,34 @@
 <th>Mover a películas</th>
 <th>Mover a series</th>
 <th>Mover a música</th>
-<th>Eliminar</th>
+<!--<th>Eliminar</th>-->
 </tr>
 </thead>
 {% for download in downloads %}
 <tr>
-<td>{{ download }}</td>
+<td>{{ download.name }}</td>
 <td>
-<button type="button" class="btn btn-default btn-lg" onclick="location.href='{{ url_for('classify', name=download, category='peliculas') }}';">
+<button type="button" class="btn btn-default btn-lg" onclick="location.href='{{ url_for('classify', id=download.id, category='peliculas') }}';">
   <span class="glyphicon glyphicon-film"></span>
 </button>
 </td>
 <td>
-<button type="button" class="btn btn-default btn-lg" onclick="location.href='{{ url_for('classify', name=download, category='series') }}';">
+<button type="button" class="btn btn-default btn-lg" onclick="location.href='{{ url_for('classify', id=download.id, category='series') }}';">
   <span class="glyphicon glyphicon-calendar"></span>
 </button>
 </td>
 <td>
-<button type="button" class="btn btn-default btn-lg" onclick="location.href='{{ url_for('classify', name=download, category='musica') }}';">
+<button type="button" class="btn btn-default btn-lg" onclick="location.href='{{ url_for('classify', id=download.id, category='musica') }}';">
   <span class="glyphicon glyphicon-music"></span>
 </button>
 </td>
+<!--
 <td>
-<button type="button" class="btn btn-default btn-lg" onclick="location.href='{{ url_for('classify', name=download, category='eliminar') }}';">
+<button type="button" class="btn btn-default btn-lg" onclick="location.href='{{ url_for('classify', id=download.id, category='eliminar') }}';">
   <span class="glyphicon glyphicon-remove"></span>
 </button>
 </td>
+-->
 
 </tr>
 {% endfor %}

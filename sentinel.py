@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import sys
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
+
 import os
 import os.path
 import re
@@ -57,6 +60,9 @@ env.user = "pi"
 # )
 # celery = make_celery(app)
 
+import transmissionrpc
+client = transmissionrpc.Client(address='localhost', user='pi', password='pi')
+
 
 # controllers
 @app.route("/")
@@ -70,10 +76,10 @@ def downloads():
     Download list for classify
     """
     try:
-        downloads_list = [file.encode('ascii', 'ignore') for file in run("ls -1 %s" % HDD_PATH + DOWNLOADS_PATH).split('\r\n')]
+        #downloads_list = [file.encode('ascii', 'ignore') for file in run("ls -1 %s" % HDD_PATH + DOWNLOADS_PATH).split('\r\n')]
         #downloads_list = [elem.encode('ascii', 'ignore') for elem in os.listdir('/media/elements/Descargas/')]
-        if '' in downloads_list:
-            downloads_list.remove('')
+        #downloads_list = os.listdir('/media/elements/Descargas/')
+        downloads_list = [torrent for torrent in client.get_torrents() if torrent.progress == 100.0 and torrent.downloadDir == '/media/elements/Descargas']
     except OSError as e:
         flash(u'No es posible acceder al directorio de descargas. ¿está HDD montado? {}'.format(e))
         downloads_list = []
@@ -84,20 +90,23 @@ def downloads():
     return render_template('downloads.html', downloads=downloads_list)
 
 
-@app.route("/classify/<name>/<category>")
-def classify(name, category):
+@app.route("/classify/<id>/<category>")
+def classify(id, category):
     """
     Classify downloaded element
     """
+    torrent = client.get_torrent(id)
+
     try:
         if category == 'eliminar':
-            _remove(name)
+            pass
+            #_remove(name)
         elif category == 'series':
-            destination_path = _get_serie_destination_path(name, category)
-            _move_to_destination(name, category, destination_path)
+            destination_path = _get_serie_destination_path(id, category)
+            _move_to_destination(torrent, category, destination_path)
         else:
             destination_path = DESTINATION_CATEGORIES_PATHS[category]
-            _move_to_destination(name, category, destination_path)
+            _move_to_destination(torrent, category, destination_path)
     except BaseException as e:
         flash(u'Error desconocido: {} {}'.format(type(e), e.message))
 
@@ -125,20 +134,26 @@ def _get_serie_destination_path(name, category):
     return destination_path
 
 
-def _move_to_destination(name, category, destination_path):
+def _move_to_destination(torrent, category, destination_path):
     try:
         # mover a directorio destino
-        origin = os.path.normpath(HDD_PATH + '/' + DOWNLOADS_PATH + '/' + name)
-        destination = os.path.normpath(HDD_PATH + '/' + destination_path + '/' + name)
-        run('mv "%s" "%s"' % (origin, destination))
+        origin = os.path.normpath(HDD_PATH + '/' + DOWNLOADS_PATH + '/' + torrent.name)
+        destination = os.path.normpath(HDD_PATH + '/' + destination_path + '/' + torrent.name)
+        
+        torrent.move_data(destination)
+        #run('mv "%s" "%s"' % (origin, destination))
     except BaseException as e:
-        flash(u'Error mientras se movía "{name}" a "{category}": {error}'.format(name=name, category=category, error=e.strerror))
+        flash(u'Error mientras se movía "{name}" a "{category}": {error}'.format(name=torrent.name,
+                                                                                 category=category,
+                                                                                 error=e.strerror))
     else:
         # call XBMC to update collection
         xbmc_jsonrpc = 'jsonrpc?request={"jsonrpc": "2.0", "method": "%s"}' % XBMC_SCAN_METHODS[category]
         requests.get('http://{host}:{port}/{url}'.format(host=XBMC_HOST, port=XBMC_PORT, url=xbmc_jsonrpc), auth=(XBMC_USER, XBMC_PASSWD))
 
-        flash(u'"{name}" movido correctamente a "{category} ({destination})"'.format(name=name, category=category, destination=destination_path))
+        flash(u'"{name}" movido correctamente a "{category} ({destination})"'.format(name=torrent.name,
+                                                                                     category=category,
+                                                                                     destination=destination_path))
 
 
 @app.route("/run-sentinel")
