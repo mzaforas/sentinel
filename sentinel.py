@@ -43,9 +43,9 @@ DOWNLOADS_PATH = '/Descargas'
 DESTINATION_CATEGORIES_PATHS = {'peliculas': 'Peliculas',
                                 'series': 'Series',
                                 'musica': 'Musica'}
-XBMC_HOST = 'xbmc'
+XBMC_HOST = 'kodi'
 XBMC_PORT = '8080'
-XBMC_USER = 'xbmc'
+XBMC_USER = 'kodi'
 XBMC_PASSWD = ''
 XBMC_SCAN_METHODS = {'peliculas': 'VideoLibrary.Scan',
                      'series': 'VideoLibrary.Scan',
@@ -108,7 +108,7 @@ def classify(id, category):
             destination_path = DESTINATION_CATEGORIES_PATHS[category]
             _move_to_destination(torrent, category, destination_path)
     except BaseException as e:
-        flash(u'Error desconocido: {} {}'.format(type(e), e.message))
+        flash(u'Error desconocido: {} {}. category: {}'.format(type(e), e.message, category))
 
     return redirect(url_for('downloads'))
 
@@ -126,7 +126,8 @@ def _remove(name):
 def _get_serie_destination_path(name, category):
     # si se detecta el patron de una serie en el nombre se modifica el directorio destino
     destination_serie = ''
-    series_names = run("ls -1 %s" % HDD_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category]).split('\r\n')
+    #series_names = run("ls -1 %s" % HDD_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category]).split('\r\n')
+    series_names = os.listdir(os.path.normpath(HDD_PATH + '/' + DESTINATION_CATEGORIES_PATHS[category]))
     for serie_name in series_names:
         if serie_name.lower().replace(' ', '') in re.sub('[._\- ]', '', name.lower()):
             destination_serie = '/' + serie_name
@@ -148,8 +149,8 @@ def _move_to_destination(torrent, category, destination_path):
                                                                                  error=e.strerror))
     else:
         # call XBMC to update collection
-        xbmc_jsonrpc = 'jsonrpc?request={"jsonrpc": "2.0", "method": "%s"}' % XBMC_SCAN_METHODS[category]
-        requests.get('http://{host}:{port}/{url}'.format(host=XBMC_HOST, port=XBMC_PORT, url=xbmc_jsonrpc), auth=(XBMC_USER, XBMC_PASSWD))
+        #xbmc_jsonrpc = 'jsonrpc?request={"jsonrpc": "2.0", "method": "%s"}' % XBMC_SCAN_METHODS[category]
+        #requests.get('http://{host}:{port}/{url}'.format(host=XBMC_HOST, port=XBMC_PORT, url=xbmc_jsonrpc), auth=(XBMC_USER, XBMC_PASSWD))
 
         flash(u'"{name}" movido correctamente a "{category} ({destination})"'.format(name=torrent.name,
                                                                                      category=category,
